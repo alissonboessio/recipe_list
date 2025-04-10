@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_list/rotas.dart';
-import 'package:recipe_list/screens/genre/genre_screen.dart';
-import 'package:recipe_list/screens/genre/genres_screen.dart';
-import 'package:recipe_list/screens/movie/movie_screen.dart';
-import 'package:recipe_list/screens/movie/movies_screen.dart';
-import 'package:recipe_list/services/genre_service.dart';
-import 'package:recipe_list/services/movie_service.dart';
+import 'package:recipe_list/screens/recipes/recipe_screen.dart';
+import 'package:recipe_list/screens/recipes/recipes_screen.dart';
+import 'package:recipe_list/services/ingredient_service.dart';
 import 'package:provider/provider.dart';
+import 'package:recipe_list/services/recipe_service.dart';
 
 void main() {
   runApp(const MainApp());
@@ -19,16 +17,15 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => GenreService()),
-        ChangeNotifierProvider(create: (_) => MovieService()),
+        ChangeNotifierProvider(create: (_) => RecipeService()),
+        ChangeNotifierProvider(create: (_) => IngredientService()),
       ],
       child: MaterialApp(
-        initialRoute: Rotas.genres,
+        initialRoute: Rotas.recipes,
         routes: {
-          Rotas.genres: (context) => GenresScreen(),
-          Rotas.genre: (context) => GenreScreen(),
-          Rotas.movies: (context) => MoviesScreen(),
-          Rotas.movie: (context) => MovieScreen(),
+          Rotas.recipes: (context) => RecipesScreen(),
+          Rotas.recipe: (context) => RecipeScreen(),
+          // Rotas.recipeEdit: (context) => RecipeScreen(),
         }
       ),
     );
