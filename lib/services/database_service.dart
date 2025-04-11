@@ -1,3 +1,4 @@
+import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
@@ -16,8 +17,8 @@ class DatabaseService {
 
   Future<Database> initDatabase() async {
     final databasePath = await getDatabasesPath();
-    final path = '$databasePath/recipe_list.db';
-    // await deleteDatabase(path);
+    final path = join(databasePath, 'recipe_list.db');
+    //await deleteDatabase(path);
     return openDatabase(
       path,
       version: 1,
@@ -42,24 +43,24 @@ class DatabaseService {
       ..execute(
         'CREATE TABLE recipes(id INTEGER PRIMARY KEY, name TEXT, grade INTEGER, prepare_time INTEGER, created_at INTEGER)',
       ) // created_at (unix timestamp in seconds) prepare_time (seconds)
-      ..execute(''' 
-        CREATE TABLE ingredients(
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        quantity INTEGER,
-        measure TEXT,
-        recipe_id INTEGER,
-        FOREIGN KEY (recipe_id) REFERENCES recipes(id)
-        )
-       ''') // measure can be grams, cups, tablespoons etc
       ..execute('''
-        CREATE TABLE instructions(
-        id INTEGER PRIMARY KEY,
-        order INTEGER,
-        instruction TEXT,
-        recipe_id INTEGER,
-        FOREIGN KEY (recipe_id) REFERENCES recipes(id)
-        )
-        ''');
+      CREATE TABLE ingredients(
+      id INTEGER PRIMARY KEY,
+      name TEXT,
+      quantity INTEGER,
+      measure TEXT,
+      recipe_id INTEGER,
+      FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+      )
+     ''') // measure can be grams, cups, tablespoons etc
+      ..execute('''
+      CREATE TABLE instructions(
+      id INTEGER PRIMARY KEY,
+      "order" INTEGER,
+      instruction TEXT,
+      recipe_id INTEGER,
+      FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+      )
+      ''');
   }
 }

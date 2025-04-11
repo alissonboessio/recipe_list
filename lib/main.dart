@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:recipe_list/services/recipe_service.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await DatabaseService().initDatabase();
 
   runApp(const MainApp());
