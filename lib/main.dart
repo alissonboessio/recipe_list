@@ -6,6 +6,7 @@ import 'package:recipe_list/services/ingredient_service.dart';
 import 'package:recipe_list/services/database_service.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe_list/services/recipe_service.dart';
+import 'package:recipe_list/services/sequence_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,7 @@ class MainApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => RecipeService()),
         ChangeNotifierProvider(create: (_) => IngredientService()),
+        ChangeNotifierProvider(create: (_) => SequenceService()),
       ],
       child: MaterialApp(
         initialRoute: Rotas.recipes,

@@ -11,47 +11,38 @@ class RecipeScreen extends StatefulWidget {
 }
 
 class _RecipeScreenState extends State<RecipeScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _descriptionController = TextEditingController();
+  late int recipeId;
 
   @override
   Widget build(BuildContext context) {
 
     final service = Provider.of<RecipeService>(context);
 
+    if (ModalRoute.of(context)!.settings.arguments != null) {
+      if (ModalRoute.of(context)!.settings.arguments is int) {
+        recipeId = ModalRoute.of(context)!.settings.arguments as int;     
+      }
+    }
+
+    final Recipe? recipe = service.findById(recipeId);
+
+    if (recipe == null) {
+      return const Center(child: Text("Receita não encontrada!"));
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text("Receita"),),
       body: Padding(
         padding: const EdgeInsets.all(32),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: 8,
-            children: [
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Nome da Receita'),
-                validator: (value) => value!.isEmpty ? 'Nome é obrigatório!' : null,
-              ),
+        child: Column(
+          spacing: 8,
+          children: [
+            
+            Text(recipe.name, style: const TextStyle(fontSize: 24),),           
 
-              SizedBox(height: 30,),
-
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    final description = _descriptionController.text;
-                    service.create(Recipe(id: 0, name: description, preparationTime: 60));
-
-                    Navigator.pop(context);
-                  }
-                }, 
-                child: const Text('Salvar'),
-              ),
-            ],
-          ),
+            SizedBox(height: 30,),
+           
+          ],
         ),
       ),
     );
