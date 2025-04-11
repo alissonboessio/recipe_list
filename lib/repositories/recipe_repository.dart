@@ -2,8 +2,8 @@ import 'package:recipe_list/models/recipe.dart';
 
 class RecipeRepository {
   final List<Recipe> list = [
-    Recipe(id: 1, name: "Ação", rating: 5, preparationTime: 30),
-    Recipe(id: 2, name: "Terror", rating: 4, preparationTime: 45),
+    Recipe(id: 1, name: "Nhoque", rating: 5, preparationTime: 30),
+    Recipe(id: 2, name: "Carne de sol", rating: 4, preparationTime: 45),
   ];
 
   List<Recipe> get findAll => list;
