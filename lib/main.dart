@@ -3,10 +3,13 @@ import 'package:recipe_list/rotas.dart';
 import 'package:recipe_list/screens/recipes/recipe_screen.dart';
 import 'package:recipe_list/screens/recipes/recipes_screen.dart';
 import 'package:recipe_list/services/ingredient_service.dart';
+import 'package:recipe_list/services/database_service.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe_list/services/recipe_service.dart';
 
-void main() {
+Future<void> main() async {
+  await DatabaseService().initDatabase();
+
   runApp(const MainApp());
 }
 
@@ -26,7 +29,7 @@ class MainApp extends StatelessWidget {
           Rotas.recipes: (context) => RecipesScreen(),
           Rotas.recipe: (context) => RecipeScreen(),
           // Rotas.recipeEdit: (context) => RecipeScreen(),
-        }
+        },
       ),
     );
   }
