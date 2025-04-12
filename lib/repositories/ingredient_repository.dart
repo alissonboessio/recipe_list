@@ -2,7 +2,7 @@ import 'package:recipe_list/models/ingredient.dart';
 
 class IngredientRepository {
   final List<Ingredient> list = [
-    Ingredient(id: 1, name: "O Resgate do Soldado Ryan", quantity: 2, recipeId: 1),
+    Ingredient(id: 1, name: "carne", quantity: 2, recipeId: 1, measure: "kg"),
   ];
 
   List<Ingredient> get findAll => list;
@@ -17,7 +17,7 @@ class IngredientRepository {
 
   void create(Ingredient obj) {
     final id = list.isNotEmpty ? list.last.id + 1 : 1;
-    list.add(Ingredient(id: id, quantity: obj.quantity, recipeId: obj.recipeId, name: obj.name));
+    list.add(Ingredient(id: id, quantity: obj.quantity, recipeId: obj.recipeId, name: obj.name, measure: obj.measure));
   }
 
   void update(Ingredient obj) {

@@ -35,6 +35,9 @@ class _StarRatingState extends State<StarRating> {
         "The star rating widget will not work with an infinite width. Please limit the widget's width",
       );
     }
+    
+    if (widget.onRatingChanged == null) return; // Desativa se não for interativo
+
     final starWidth = maxWidth / widget.starCount;
     double rawRating = localPosition.dx / starWidth;
     double newRating = (rawRating * 2).ceil() / 2; // Round to nearest 0.5

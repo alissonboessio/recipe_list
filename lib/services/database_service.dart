@@ -41,7 +41,7 @@ class DatabaseService {
   void _onCreate(Database db, int version) {
     db
       ..execute(
-        'CREATE TABLE recipes(id INTEGER PRIMARY KEY, name TEXT, grade INTEGER, prepare_time INTEGER, created_at INTEGER)',
+        'CREATE TABLE recipes(id INTEGER PRIMARY KEY, name TEXT, rating INTEGER, preparationTime INTEGER, createdAt INTEGER)',
       ) // created_at (unix timestamp in seconds) prepare_time (seconds)
       ..execute('''
       CREATE TABLE ingredients(
@@ -49,17 +49,17 @@ class DatabaseService {
       name TEXT,
       quantity INTEGER,
       measure TEXT,
-      recipe_id INTEGER,
-      FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+      recipeId INTEGER,
+      FOREIGN KEY (recipeId) REFERENCES recipes(id)
       )
      ''') // measure can be grams, cups, tablespoons etc
       ..execute('''
       CREATE TABLE instructions(
       id INTEGER PRIMARY KEY,
-      "order" INTEGER,
+      order INTEGER,
       instruction TEXT,
-      recipe_id INTEGER,
-      FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+      recipeId INTEGER,
+      FOREIGN KEY (recipeId) REFERENCES recipes(id)
       )
       ''');
   }

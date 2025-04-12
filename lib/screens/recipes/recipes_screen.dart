@@ -3,7 +3,9 @@ import 'package:recipe_list/rotas.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe_list/services/ingredient_service.dart';
 import 'package:recipe_list/services/recipe_service.dart';
-import 'package:recipe_list/services/sequence_service.dart';
+import 'package:recipe_list/services/instruction_service.dart';
+
+import '../../widgets/star_rating.dart';
 
 class RecipesScreen extends StatelessWidget {
 
@@ -14,7 +16,7 @@ class RecipesScreen extends StatelessWidget {
 
     final service = Provider.of<RecipeService>(context);
     final serviceIngredient = Provider.of<IngredientService>(context);
-    final serviceSequence = Provider.of<SequenceService>(context);
+    final serviceInstruction = Provider.of<InstructionService>(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text("Receitas")),
@@ -36,22 +38,26 @@ class RecipesScreen extends StatelessWidget {
                 Text("${serviceIngredient.findAllByRecipe(recipe.id).length} ingredientes",
                  ),
                 const SizedBox(height: 5,),
-                Text("${serviceSequence.findAllByRecipe(recipe.id).length} preparos"),
+                Text("${serviceInstruction.findAllByRecipe(recipe.id).length} preparos"),
               ],
             ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text("${recipe.rating} estrelas",
-                  style: const TextStyle(fontSize: 16)
-                ), // mudar para icons pintados / apagados
-                SizedBox(height: 5,),
-                Text("${recipe.preparationTime} min", 
-                  style: const TextStyle(fontSize: 16)
-                ),
-              ]
-
+            trailing: SizedBox(
+              width: 75,              
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  StarRating(
+                    starCount: 5,
+                    size: 15,
+                    rating: recipe.rating?.toDouble() ?? 0.0,
+                  ),
+                  SizedBox(height: 5,),
+                  Text("${recipe.preparationTime} min", 
+                    style: const TextStyle(fontSize: 16)
+                  ),
+                ]              
+              ),
             ),
             onTap: () => Navigator.pushNamed(context, Rotas.recipe, arguments: recipe.id),
           );
