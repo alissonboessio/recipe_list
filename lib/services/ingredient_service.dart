@@ -26,5 +26,10 @@ class IngredientService extends ChangeNotifier {
     repository.update(obj);
     notifyListeners();
   }
+  
+  void delete(int id) {
+    repository.delete(id);
+    notifyListeners();
+  }
 
 }

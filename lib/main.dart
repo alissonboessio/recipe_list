@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_list/rotas.dart';
+import 'package:recipe_list/screens/recipes/recipe_edit_screen.dart';
 import 'package:recipe_list/screens/recipes/recipe_screen.dart';
 import 'package:recipe_list/screens/recipes/recipes_screen.dart';
 import 'package:recipe_list/services/ingredient_service.dart';
@@ -32,7 +33,7 @@ class MainApp extends StatelessWidget {
         routes: {
           Rotas.recipes: (context) => RecipesScreen(),
           Rotas.recipe: (context) => RecipeScreen(),
-          // Rotas.recipeEdit: (context) => RecipeScreen(),
+          Rotas.recipeEdit: (context) => RecipeEditScreen(),
         },
       ),
     );

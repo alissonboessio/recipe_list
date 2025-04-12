@@ -70,7 +70,7 @@ class _StarRatingState extends State<StarRating> {
               );
             },
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: List.generate(widget.starCount, (index) {
                 print('NEW RATING $_displayRating');
                 final currentRating = _displayRating - index;

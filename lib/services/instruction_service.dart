@@ -10,7 +10,9 @@ class InstructionService extends ChangeNotifier {
 
 
   List<Instruction> findAllByRecipe(int recipeId) {
-    return repository.findAllByRecipe(recipeId);
+    var instructions = repository.findAllByRecipe(recipeId);
+    instructions.sort((a, b) => a.order.compareTo(b.order));
+    return instructions;
   }
 
   Instruction? findById(int id) {
@@ -24,6 +26,11 @@ class InstructionService extends ChangeNotifier {
 
   void update(Instruction obj) {
     repository.update(obj);
+    notifyListeners();
+  }
+
+  void delete(int id) {
+    repository.delete(id);
     notifyListeners();
   }
 

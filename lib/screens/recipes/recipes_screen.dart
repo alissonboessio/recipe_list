@@ -65,7 +65,8 @@ class RecipesScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, Rotas.recipe);
+          // Estudar forma de reutilizar a view de edicao para adicionar nova receita
+          // Navigator.pushNamed(context, Rotas.recipeEdit);
         },
         tooltip: "Adicionar Receita",
         child: const Icon(Icons.add),

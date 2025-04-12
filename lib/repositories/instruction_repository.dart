@@ -17,13 +17,17 @@ class InstructionRepository {
   }
 
   void create(Instruction obj) {
-    final id = list.isNotEmpty ? list.last.id + 1 : 1;
-    list.add(Instruction(id: id, order: obj.order, instruction: obj.instruction, recipeId: obj.recipeId));
+    list.add(Instruction(order: obj.order, instruction: obj.instruction, recipeId: obj.recipeId));
   }
 
   void update(Instruction obj) {
     int index = list.indexWhere((movie) => movie.id == obj.id);
     list[index] = obj;
+  }
+
+  void delete(int id) {
+    int index = list.indexWhere((instruction) => instruction.id == id);
+    list.removeAt(index);
   }
 
 }
