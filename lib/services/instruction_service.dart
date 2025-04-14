@@ -1,37 +1,41 @@
-
 import 'package:flutter/material.dart';
 import 'package:recipe_list/models/instruction.dart';
-import 'package:recipe_list/repositories/instruction_repository.dart';
+import 'package:recipe_list/repositories/repository.dart';
 
 class InstructionService extends ChangeNotifier {
-  final InstructionRepository repository = InstructionRepository();
+  final _repository = GenericRepository<Instruction>(
+    tableName: Instruction.tableName,
+    fromMap: Instruction.fromMap,
+  );
 
-  List<Instruction> get findAll => repository.findAll; 
+  Future<List<Instruction>> get findAll => _repository.findAll();
 
-
-  List<Instruction> findAllByRecipe(int recipeId) {
-    var instructions = repository.findAllByRecipe(recipeId);
-    instructions.sort((a, b) => a.order.compareTo(b.order));
+  Future<List<Instruction>> findAllByRecipe(int recipeId) async {
+    final instructions = await _repository.findAllByRecipe(recipeId);
+    instructions.sort(
+      (a, b) => a.instructionOrder.compareTo(b.instructionOrder),
+    );
     return instructions;
   }
 
-  Instruction? findById(int id) {
-    return repository.findById(id);
+  Future<Instruction?> findById(int id) {
+    return _repository.findById(id);
   }
 
-  void create(Instruction obj) {
-    repository.create(obj);
+  Future<int> createOrUpdate(Instruction obj) {
+    final id = _repository.createOrUpdate(obj);
+    notifyListeners();
+    return id;
+  }
+
+  // void update(Instruction obj) {
+  //   repository.update(obj);
+  //   notifyListeners();
+  // }
+
+  Future<void> delete(int id) async {
+    await _repository.delete(id);
     notifyListeners();
   }
-
-  void update(Instruction obj) {
-    repository.update(obj);
-    notifyListeners();
-  }
-
-  void delete(int id) {
-    repository.delete(id);
-    notifyListeners();
-  }
-
 }
+

@@ -1,35 +1,38 @@
-
 import 'package:flutter/material.dart';
 import 'package:recipe_list/models/ingredient.dart';
-import 'package:recipe_list/repositories/ingredient_repository.dart';
+import 'package:recipe_list/repositories/repository.dart';
 
 class IngredientService extends ChangeNotifier {
-  final IngredientRepository repository = IngredientRepository();
+  // final IngredientRepository repository = IngredientRepository();
+  final _repository = GenericRepository<Ingredient>(
+    tableName: Ingredient.tableName,
+    fromMap: Ingredient.fromMap,
+  );
 
-  List<Ingredient> get findAll => repository.findAll; 
+  Future<List<Ingredient>> get findAll => _repository.findAll();
 
-
-  List<Ingredient> findAllByRecipe(int recipeId) {
-    return repository.findAllByRecipe(recipeId);
+  Future<List<Ingredient>> findAllByRecipe(int recipeId) {
+    return _repository.findAllByRecipe(recipeId);
   }
 
-  Ingredient? findById(int id) {
-    return repository.findById(id);
+  Future<Ingredient?> findById(int id) {
+    return _repository.findById(id);
   }
 
-  void create(Ingredient obj) {
-    repository.create(obj);
+  Future<int> createOrUpdate(Ingredient obj) async {
+    final id = await _repository.createOrUpdate(obj);
+    notifyListeners();
+    return id;
+  }
+
+  // void update(Ingredient obj) {
+  //   repository.update(obj);
+  //   notifyListeners();
+  // }
+
+  Future<void> delete(int id) async {
+    await _repository.delete(id);
     notifyListeners();
   }
-
-  void update(Ingredient obj) {
-    repository.update(obj);
-    notifyListeners();
-  }
-  
-  void delete(int id) {
-    repository.delete(id);
-    notifyListeners();
-  }
-
 }
+

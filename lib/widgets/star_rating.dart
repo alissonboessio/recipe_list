@@ -35,10 +35,12 @@ class _StarRatingState extends State<StarRating> {
         "The star rating widget will not work with an infinite width. Please limit the widget's width",
       );
     }
-    
-    if (widget.onRatingChanged == null) return; // Desativa se não for interativo
 
-    final starWidth = maxWidth / widget.starCount;
+    if (widget.onRatingChanged == null) {
+      return; // Desativa se não for interativo
+    }
+
+    final starWidth = 40; //maxWidth / widget.starCount;
     double rawRating = localPosition.dx / starWidth;
     double newRating = (rawRating * 2).ceil() / 2; // Round to nearest 0.5
     newRating = newRating.clamp(0.0, widget.starCount.toDouble());
@@ -72,7 +74,6 @@ class _StarRatingState extends State<StarRating> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: List.generate(widget.starCount, (index) {
-                print('NEW RATING $_displayRating');
                 final currentRating = _displayRating - index;
                 Icon icon;
 
