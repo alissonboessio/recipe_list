@@ -22,20 +22,20 @@ class InstructionService extends ChangeNotifier {
     return _repository.findById(id);
   }
 
-  Future<int> createOrUpdate(Instruction obj) {
-    final id = _repository.createOrUpdate(obj);
+  Future<int> create(Instruction obj) {
+    final id = _repository.create(obj);
     notifyListeners();
     return id;
   }
 
-  // void update(Instruction obj) {
-  //   repository.update(obj);
-  //   notifyListeners();
-  // }
+  Future<int> udpate(Instruction obj) {
+    final id = _repository.update(obj);
+    notifyListeners();
+    return id;
+  }
 
   Future<void> delete(int id) async {
     await _repository.delete(id);
     notifyListeners();
   }
 }
-

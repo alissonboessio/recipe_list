@@ -10,7 +10,7 @@ class GenericRepository<T extends BaseModel> {
 
   Future<Database> get _databaseInstance => DatabaseService().database;
 
-  Future<int> createOrUpdate(T item) async {
+  Future<int> create(T item) async {
     final db = await _databaseInstance;
     return await db.insert(
       tableName,
@@ -44,15 +44,15 @@ class GenericRepository<T extends BaseModel> {
     return data.map(fromMap).toList();
   }
 
-  // Future<int> update(T item) async {
-  //   final db = await _databaseInstance;
-  //   return await db.update(
-  //     tableName,
-  //     item.toMap(),
-  //     where: 'id = ?',
-  //     whereArgs: [item.id],
-  //   );
-  // }
+   Future<int> update(T item) async {
+     final db = await _databaseInstance;
+     return await db.update(
+       tableName,
+       item.toMap(),
+       where: 'id = ?',
+       whereArgs: [item.id],
+     );
+   }
 
   Future<int> delete(int id) async {
     final db = await _databaseInstance;

@@ -97,7 +97,7 @@ class _RecipeFormState extends State<RecipeForm> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    final result = await _recipeService!.createOrUpdate(
+                    final result = await _recipeService!.create(
                       Recipe(
                         name: _recipeNameController.text,
                         preparationTime: int.parse(

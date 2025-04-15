@@ -40,7 +40,7 @@ class _StarRatingState extends State<StarRating> {
       return; // Desativa se não for interativo
     }
 
-    final starWidth = 40; //maxWidth / widget.starCount;
+    final starWidth = widget.size; //maxWidth / widget.starCount;
     double rawRating = localPosition.dx / starWidth;
     double newRating = (rawRating * 2).ceil() / 2; // Round to nearest 0.5
     newRating = newRating.clamp(0.0, widget.starCount.toDouble());

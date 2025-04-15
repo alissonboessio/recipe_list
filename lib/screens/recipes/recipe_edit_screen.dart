@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:recipe_list/models/complete_recipe.dart';
 import 'package:recipe_list/models/ingredient.dart';
 import 'package:recipe_list/models/instruction.dart';
@@ -23,6 +22,9 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
   IngredientService? _ingredientService;
   InstructionService? _instructionService;
 
+  final _recipeNameController = TextEditingController();
+  double _recipeRating = 0;
+
   final _ingredientNameController = TextEditingController();
   final _ingredientMeasureController = TextEditingController();
   final _ingredientQuantityController = TextEditingController();
@@ -33,8 +35,11 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     final ingredients = await _ingredientService!.findAllByRecipe(id);
     final instructions = await _instructionService!.findAllByRecipe(id);
 
+    _recipeNameController.text = recipe!.name;
+    _recipeRating = recipe.rating! / 2;
+
     return CompleteRecipe(
-      recipe: recipe!,
+      recipe: recipe,
       ingredients: ingredients,
       instructions: instructions,
     );
@@ -46,7 +51,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _recipeService = Provider.of<RecipeService>(context, listen: true);
+    _recipeService = Provider.of<RecipeService>(context, listen: false);
     _ingredientService = Provider.of<IngredientService>(context, listen: true);
     _instructionService = Provider.of<InstructionService>(
       context,
@@ -63,10 +68,6 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
 
   @override
   void dispose() {
-    _recipeService!.dispose();
-    _ingredientService!.dispose();
-    _instructionService!.dispose();
-
     _ingredientNameController.dispose();
     _ingredientMeasureController.dispose();
     _ingredientQuantityController.dispose();
@@ -99,17 +100,33 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
               padding: const EdgeInsets.all(16),
               child: ListView(
                 children: [
-                  Text(
-                    recipe.name,
+                  TextField(
+                    controller: _recipeNameController,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
+                    onSubmitted: (val) {
+                      setState(() {
+                        recipe.name = val;
+                      });
+
+                      _recipeService!.update(recipe);
+                    },
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    width: 75,
-                    child: StarRating(size: 15, rating: recipe.rating! / 2),
+                  StarRating(
+                    size: 30,
+                    rating: _recipeRating,
+                    onRatingChanged: (newRating) {
+                      setState(() {
+                        _recipeRating = newRating;
+                      });
+
+                      recipe.rating = (_recipeRating * 2).toInt();
+
+                      _recipeService!.update(recipe);
+                    },
                   ),
                   const SizedBox(height: 8),
                   Text('Tempo de preparo: ${recipe.preparationTime} min'),
@@ -262,7 +279,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        _ingredientService!.createOrUpdate(
+                        _ingredientService!.create(
                           Ingredient(
                             recipeId: recipeId,
                             name: _ingredientNameController.text,
@@ -327,7 +344,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
 
                         final newOrder = instructions.length + 1;
 
-                        _instructionService!.createOrUpdate(
+                        _instructionService!.create(
                           Instruction(
                             recipeId: recipeId,
                             instructionOrder: newOrder,
