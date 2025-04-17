@@ -39,9 +39,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
   @override
   void dispose() {
-    _recipeService!.dispose();
-    _ingredientService!.dispose();
-    _instructionService!.dispose();
     super.dispose();
   }
 

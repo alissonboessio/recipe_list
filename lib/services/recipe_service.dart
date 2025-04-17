@@ -14,8 +14,14 @@ class RecipeService extends ChangeNotifier {
     return _repository.findById(id);
   }
 
-  Future<int> createOrUpdate(Recipe obj) {
-    final id = _repository.createOrUpdate(obj);
+  Future<int> create(Recipe obj) {
+    final id = _repository.create(obj);
+    notifyListeners();
+    return id;
+  }
+
+  Future<int> update(Recipe obj) {
+    final id = _repository.update(obj);
     notifyListeners();
     return id;
   }

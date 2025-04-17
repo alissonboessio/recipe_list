@@ -19,20 +19,20 @@ class IngredientService extends ChangeNotifier {
     return _repository.findById(id);
   }
 
-  Future<int> createOrUpdate(Ingredient obj) async {
-    final id = await _repository.createOrUpdate(obj);
+  Future<int> create(Ingredient obj) async {
+    final id = await _repository.create(obj);
     notifyListeners();
     return id;
   }
 
-  // void update(Ingredient obj) {
-  //   repository.update(obj);
-  //   notifyListeners();
-  // }
+  Future<int> update(Ingredient obj) async {
+    final id = await _repository.update(obj);
+    notifyListeners();
+    return id;
+  }
 
   Future<void> delete(int id) async {
     await _repository.delete(id);
     notifyListeners();
   }
 }
-

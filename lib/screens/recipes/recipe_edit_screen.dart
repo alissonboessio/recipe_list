@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:recipe_list/models/base_model.dart';
 import 'package:recipe_list/models/complete_recipe.dart';
 import 'package:recipe_list/models/ingredient.dart';
 import 'package:recipe_list/models/instruction.dart';
@@ -7,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:recipe_list/services/ingredient_service.dart';
 import 'package:recipe_list/services/instruction_service.dart';
 import 'package:recipe_list/services/recipe_service.dart';
-import 'package:recipe_list/widgets/star_rating.dart';
+import 'package:recipe_list/widgets/recipe_form.dart';
 
 class RecipeEditScreen extends StatefulWidget {
   const RecipeEditScreen({super.key});
@@ -23,6 +24,8 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
   IngredientService? _ingredientService;
   InstructionService? _instructionService;
 
+  final _recipeNameController = TextEditingController();
+
   final _ingredientNameController = TextEditingController();
   final _ingredientMeasureController = TextEditingController();
   final _ingredientQuantityController = TextEditingController();
@@ -33,8 +36,10 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     final ingredients = await _ingredientService!.findAllByRecipe(id);
     final instructions = await _instructionService!.findAllByRecipe(id);
 
+    _recipeNameController.text = recipe!.name;
+
     return CompleteRecipe(
-      recipe: recipe!,
+      recipe: recipe,
       ingredients: ingredients,
       instructions: instructions,
     );
@@ -46,7 +51,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _recipeService = Provider.of<RecipeService>(context, listen: true);
+    _recipeService = Provider.of<RecipeService>(context, listen: false);
     _ingredientService = Provider.of<IngredientService>(context, listen: true);
     _instructionService = Provider.of<InstructionService>(
       context,
@@ -63,10 +68,6 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
 
   @override
   void dispose() {
-    _recipeService!.dispose();
-    _ingredientService!.dispose();
-    _instructionService!.dispose();
-
     _ingredientNameController.dispose();
     _ingredientMeasureController.dispose();
     _ingredientQuantityController.dispose();
@@ -99,23 +100,10 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
               padding: const EdgeInsets.all(16),
               child: ListView(
                 children: [
-                  Text(
-                    recipe.name,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  RecipeForm(updateVal: recipe),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    width: 75,
-                    child: StarRating(size: 15, rating: recipe.rating! / 2),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('Tempo de preparo: ${recipe.preparationTime} min'),
-
                   _sectionHeader("Ingredientes", () {
-                    _showAddIngredientBottomSheet(context);
+                    _showIngredientBottomSheet(context);
                   }),
 
                   const SizedBox(height: 10),
@@ -125,11 +113,12 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                     itemCount: ingredients.length,
                     itemBuilder: (context, index) {
                       final ing = ingredients[index];
-                      return GestureDetector(
+                      return InkWell(
                         onLongPress:
                             () => _showItemOptions(
                               context,
-                              onEdit: () => _editIngredient(ing),
+                              onEdit: _showIngredientBottomSheet,
+                              updateVal: ing,
                               onDelete: () {
                                 _ingredientService!.delete(ing.id!);
                               },
@@ -145,7 +134,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
 
                   const SizedBox(height: 24),
                   _sectionHeader("Instruções", () {
-                    _showAddInstructionBottomSheet(context);
+                    _showInstructionBottomSheet(context);
                   }),
                   const SizedBox(height: 10),
                   ListView.builder(
@@ -154,11 +143,12 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                     itemCount: instructions.length,
                     itemBuilder: (context, index) {
                       final inst = instructions[index];
-                      return GestureDetector(
+                      return InkWell(
                         onLongPress:
                             () => _showItemOptions(
                               context,
-                              onEdit: () => _editInstruction(inst),
+                              onEdit: _showInstructionBottomSheet,
+                              updateVal: inst,
                               onDelete: () {
                                 _instructionService!.delete(inst.id!);
                               },
@@ -195,28 +185,29 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
 
   void _showItemOptions(
     BuildContext context, {
-    required VoidCallback onEdit,
+    required void Function(BuildContext context, {BaseModel? updateVal}) onEdit,
+    required BaseModel updateVal,
     required VoidCallback onDelete,
   }) {
     showModalBottomSheet(
       context: context,
       builder:
-          (_) => Wrap(
+          (modalContext) => Wrap(
             children: [
               ListTile(
                 leading: const Icon(Icons.edit),
                 title: const Text('Editar'),
                 onTap: () {
-                  Navigator.pop(context);
-                  onEdit();
+                  onEdit(modalContext, updateVal: updateVal);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.delete),
                 title: const Text('Excluir'),
                 onTap: () {
-                  Navigator.pop(context);
                   onDelete();
+
+                  Navigator.pop(modalContext);
                 },
               ),
             ],
@@ -224,21 +215,37 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     );
   }
 
-  void _showAddIngredientBottomSheet(BuildContext context) {
-    showModalBottomSheet(
+  void _showIngredientBottomSheet(
+    BuildContext context, {
+    BaseModel? updateVal,
+  }) async {
+    if (updateVal != null && updateVal is Ingredient) {
+      _ingredientNameController.text = updateVal.name;
+      _ingredientQuantityController.text = updateVal.quantity.toString();
+      _ingredientMeasureController.text = updateVal.measure;
+    }
+
+    await showModalBottomSheet(
       context: context,
-      isScrollControlled: false,
+      isScrollControlled: true,
       showDragHandle: true,
       builder:
-          (_) => Padding(
-            padding: const EdgeInsets.all(16),
+          (modalContext) => Padding(
+            padding: EdgeInsets.only(
+              top: 16,
+              left: 16,
+              right: 16,
+              bottom: MediaQuery.of(modalContext).viewInsets.bottom,
+            ),
             child: SizedBox(
               height: 350,
               child: Column(
                 spacing: 8.0,
                 children: [
-                  const Text(
-                    "Adicionar Ingrediente",
+                  Text(
+                    updateVal != null
+                        ? 'Editar Ingrediente'
+                        : "Adicionar Ingrediente",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 4),
@@ -252,6 +259,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                     keyboardType: TextInputType.numberWithOptions(
                       signed: false,
                     ),
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                   TextField(
                     controller: _ingredientMeasureController,
@@ -261,82 +269,34 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        _ingredientService!.createOrUpdate(
-                          Ingredient(
-                            recipeId: recipeId,
-                            name: _ingredientNameController.text,
-                            measure: _ingredientMeasureController.text,
-                            quantity:
+                      onPressed: () async {
+                        if (updateVal != null && updateVal is Ingredient) {
+                          updateVal
+                            ..name = _ingredientNameController.text
+                            ..measure = _ingredientMeasureController.text
+                            ..quantity =
                                 int.tryParse(
                                   _ingredientQuantityController.text,
                                 ) ??
-                                0,
-                          ),
-                        );
+                                0;
 
-                        _ingredientNameController.clear();
-                        _ingredientMeasureController.clear();
-                        _ingredientQuantityController.clear();
+                          await _ingredientService!.update(updateVal);
+                        } else {
+                          await _ingredientService!.create(
+                            Ingredient(
+                              recipeId: recipeId,
+                              name: _ingredientNameController.text,
+                              measure: _ingredientMeasureController.text,
+                              quantity:
+                                  int.tryParse(
+                                    _ingredientQuantityController.text,
+                                  ) ??
+                                  0,
+                            ),
+                          );
+                        }
 
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Salvar"),
-                    ),
-                  ),
-
-                  SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
-    );
-  }
-
-  void _showAddInstructionBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: false,
-      showDragHandle: true,
-      builder:
-          (_) => Padding(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              height: 300,
-              child: Column(
-                spacing: 8.0,
-                children: [
-                  const Text(
-                    "Adicionar Instrução",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 4),
-                  TextField(
-                    controller: _instructionController,
-                    decoration: const InputDecoration(labelText: "Descrição"),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                  ),
-                  Spacer(),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final instructions = await _instructionService!
-                            .findAllByRecipe(recipeId);
-
-                        final newOrder = instructions.length + 1;
-
-                        _instructionService!.createOrUpdate(
-                          Instruction(
-                            recipeId: recipeId,
-                            instructionOrder: newOrder,
-                            instruction: _instructionController.text,
-                          ),
-                        );
                         if (context.mounted) {
-                          _instructionController.clear();
-
                           Navigator.pop(context);
                         }
                       },
@@ -350,13 +310,96 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
             ),
           ),
     );
+
+    _clearIngredient();
   }
 
-  void _editIngredient(Ingredient ing) {
-    // Implementar fluxo
+  void _showInstructionBottomSheet(
+    BuildContext context, {
+    BaseModel? updateVal,
+  }) async {
+    if (updateVal != null && updateVal is Instruction) {
+      _instructionController.text = updateVal.instruction;
+    }
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder:
+          (modalContext) => Padding(
+            padding: EdgeInsets.only(
+              top: 16,
+              left: 16,
+              right: 16,
+              bottom: MediaQuery.of(modalContext).viewInsets.bottom,
+            ),
+            child: SizedBox(
+              height: 300,
+              child: Column(
+                spacing: 8.0,
+                children: [
+                  Text(
+                    updateVal != null
+                        ? 'Editar Instrução'
+                        : "Adicionar Instrução",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 4),
+                  TextField(
+                    controller: _instructionController,
+                    decoration: const InputDecoration(labelText: "Descrição"),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 5,
+                  ),
+                  Spacer(),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final instructions = await _instructionService!
+                            .findAllByRecipe(recipeId);
+
+                        if (updateVal == null) {
+                          final newOrder = instructions.length + 1;
+                          await _instructionService!.create(
+                            Instruction(
+                              recipeId: recipeId,
+                              instructionOrder: newOrder,
+                              instruction: _instructionController.text,
+                            ),
+                          );
+                        } else {
+                          if (updateVal is Instruction) {
+                            updateVal.instruction = _instructionController.text;
+
+                            await _instructionService!.update(updateVal);
+                          }
+                        }
+
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text("Salvar"),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+    );
+    _clearInstruction();
   }
 
-  void _editInstruction(Instruction inst) {
-    // Implementar fluxo
+  void _clearIngredient() {
+    _ingredientNameController.clear();
+    _ingredientQuantityController.clear();
+    _ingredientMeasureController.clear();
+  }
+
+  void _clearInstruction() {
+    _instructionController.clear();
   }
 }
