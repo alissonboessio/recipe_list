@@ -28,7 +28,7 @@ class InstructionService extends ChangeNotifier {
     return id;
   }
 
-  Future<int> udpate(Instruction obj) {
+  Future<int> update(Instruction obj) {
     final id = _repository.update(obj);
     notifyListeners();
     return id;

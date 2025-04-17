@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:recipe_list/models/complete_recipe.dart';
 import 'package:recipe_list/rotas.dart';
 import 'package:provider/provider.dart';
@@ -45,9 +46,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
   @override
   void dispose() {
-    _recipeService!.dispose();
-    _ingredientService!.dispose();
-    _instructionService!.dispose();
     super.dispose();
   }
 
@@ -101,34 +99,54 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 onDismissed: (direction) async {
                   await _recipeService!.delete(recipe.id!);
                 },
-                child: ListTile(
-                  title: Row(
+                child: InkWell(
+                  child: Row(
                     children: [
-                      Text(recipe.name, style: const TextStyle(fontSize: 24)),
-                    ],
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("${completeRecipe.ingredients.length} ingredientes"),
-                      const SizedBox(height: 5),
-                      Text("${completeRecipe.instructions.length} instruções"),
-                    ],
-                  ),
-                  trailing: SizedBox(
-                    width: 75,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        StarRating(size: 15, rating: recipe.rating! / 2),
-                        SizedBox(height: 5),
-                        Text(
-                          "${recipe.preparationTime} min",
-                          style: const TextStyle(fontSize: 16),
+                      Expanded(
+                        flex: 4,
+                        child: ListTile(
+                          title: Text(
+                            recipe.name,
+                            style: const TextStyle(fontSize: 24),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${completeRecipe.ingredients.length} ingredientes",
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                "${completeRecipe.instructions.length} instruções",
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            StarRating(size: 15, rating: recipe.rating! / 2),
+                            SizedBox(height: 5),
+                            Text(
+                              "${recipe.preparationTime} min",
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            Text(
+                              DateFormat('dd/MM/yyyy').format(recipe.createdAt),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   onTap:
                       () => Navigator.pushNamed(
@@ -146,7 +164,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
         onPressed: () {
           showModalBottomSheet(
             context: context,
-            isScrollControlled: false,
+            isScrollControlled: true,
             showDragHandle: true,
             useSafeArea: true,
             builder: (_) => RecipeForm(),

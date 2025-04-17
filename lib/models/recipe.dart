@@ -23,7 +23,7 @@ class Recipe extends BaseModel {
       name: map['name'],
       rating: map['rating'],
       preparationTime: map['preparationTime'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['preparationTime']),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
     );
   }
 
