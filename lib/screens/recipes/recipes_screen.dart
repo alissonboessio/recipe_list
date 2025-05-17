@@ -160,18 +160,36 @@ class _RecipesScreenState extends State<RecipesScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            showDragHandle: true,
-            useSafeArea: true,
-            builder: (_) => RecipeForm(),
-          );
-        },
-        tooltip: "Adicionar Receita",
-        child: const Icon(Icons.add),
+      floatingActionButton: Row(
+        spacing: 8,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () async {
+              var recipe = await _recipeService!.createRandomRecipe();
+              Navigator.pushNamed(
+                context,
+                Rotas.recipe,
+                arguments: recipe.id,
+              );
+            },
+            tooltip: "Receita Aleatória",
+            child: const Icon(Icons.help_outline),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                showDragHandle: true,
+                useSafeArea: true,
+                builder: (_) => RecipeForm(),
+              );
+            },
+            tooltip: "Adicionar Receita",
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

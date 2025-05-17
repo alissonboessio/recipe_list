@@ -94,33 +94,36 @@ class _RecipeScreenState extends State<RecipeScreen> {
                 children: [
                   Row(
                     children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            recipe.name,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              recipe.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          SizedBox(
-                            width: 75,
-                            child: StarRating(
-                              size: 15,
-                              rating: recipe.rating! / 2,
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: 75,
+                              child: StarRating(
+                                size: 15,
+                                rating: recipe.rating! / 2,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Tempo de preparo: ${recipe.preparationTime} min',
-                          ),
-                          const SizedBox(height: 24),
-                        ],
+                            const SizedBox(height: 8),
+                            Text(
+                              'Tempo de preparo: ${recipe.preparationTime} min',
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
                       ),
-                      Spacer(),
                       IconButton(
                         icon: const Icon(Icons.edit),
                         onPressed: () {
