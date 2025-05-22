@@ -165,6 +165,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
+            heroTag: null,
             onPressed: () async {
               var recipe = await _recipeService!.createRandomRecipe();
               Navigator.pushNamed(
@@ -177,6 +178,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
             child: const Icon(Icons.help_outline),
           ),
           FloatingActionButton(
+            heroTag: null,
             onPressed: () {
               showModalBottomSheet(
                 context: context,

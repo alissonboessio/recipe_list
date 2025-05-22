@@ -52,7 +52,7 @@ class RecipeService extends ChangeNotifier {
     partI++;
     recipe.rating = rating;
 
-    int id = await create(recipe);
+    recipe.id = await create(recipe);    
 
     final _repoIngredients = GenericRepository(
       tableName: Ingredient.tableName,
@@ -60,7 +60,7 @@ class RecipeService extends ChangeNotifier {
     );
 
     for (; partI < 5; partI++) {
-      await _repoIngredients.create(Ingredient(recipeId: id, name: parts[partI], measure: parts[partI].split(" ")[0], quantity: random.nextInt(10) + 1));
+      await _repoIngredients.create(Ingredient(recipeId: recipe.id!, name: parts[partI], measure: parts[partI].split(" ")[0], quantity: random.nextInt(10) + 1));
     }
 
     final _repoIntructions = GenericRepository(
@@ -69,7 +69,7 @@ class RecipeService extends ChangeNotifier {
     );
 
     for (var i = 1; partI < 9; partI++, i++) {
-      await _repoIntructions.create(Instruction(recipeId: id, instruction: parts[partI], instructionOrder: i));
+      await _repoIntructions.create(Instruction(recipeId: recipe.id!, instruction: parts[partI], instructionOrder: i));
     }
 
     return recipe;
