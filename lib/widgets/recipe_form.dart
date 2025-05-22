@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe_list/models/recipe.dart';
 import 'package:recipe_list/rotas.dart';
+import 'package:recipe_list/services/api_service.dart';
 import 'package:recipe_list/services/recipe_service.dart';
 import 'package:recipe_list/widgets/star_rating.dart';
 
@@ -37,6 +38,7 @@ class _RecipeFormState extends State<RecipeForm> {
       _recipeRatingController = updateVal.rating! / 2;
       _recipePrepTimeController.text = updateVal.preparationTime.toString();
     }
+
 
     super.initState();
   }

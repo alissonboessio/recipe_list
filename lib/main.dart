@@ -3,6 +3,7 @@ import 'package:recipe_list/rotas.dart';
 import 'package:recipe_list/screens/recipes/recipe_edit_screen.dart';
 import 'package:recipe_list/screens/recipes/recipe_screen.dart';
 import 'package:recipe_list/screens/recipes/recipes_screen.dart';
+import 'package:recipe_list/services/api_service.dart';
 import 'package:recipe_list/services/ingredient_service.dart';
 import 'package:recipe_list/services/database_service.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,7 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => RecipeService()),
         ChangeNotifierProvider(create: (_) => IngredientService()),
         ChangeNotifierProvider(create: (_) => InstructionService()),
+        ChangeNotifierProvider(create: (_) => ApiService()),
       ],
       child: MaterialApp(
         initialRoute: Rotas.recipes,
