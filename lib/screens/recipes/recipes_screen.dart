@@ -4,6 +4,7 @@ import 'package:recipe_list/models/complete_recipe.dart';
 import 'package:recipe_list/rotas.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe_list/services/ingredient_service.dart';
+import 'package:recipe_list/services/localauth_service.dart';
 import 'package:recipe_list/services/recipe_service.dart';
 import 'package:recipe_list/services/instruction_service.dart';
 import 'package:recipe_list/widgets/recipe_form.dart';
@@ -96,6 +97,22 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
               return Dismissible(
                 key: ValueKey(recipe.id!),
+                confirmDismiss: (direction) async {
+                  bool autenticado = await LocalAuth().authenticate(
+                    "Autentique-se para excluir a receita",
+                  );
+
+                  if (!autenticado) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Autenticação falhou!"),
+                      ),
+                    );
+                    return false;
+                  }
+
+                  return true;
+                },
                 onDismissed: (direction) async {
                   await _recipeService!.delete(recipe.id!);
                 },
