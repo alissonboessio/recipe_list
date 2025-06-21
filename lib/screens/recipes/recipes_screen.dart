@@ -5,8 +5,10 @@ import 'package:recipe_list/rotas.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe_list/services/ingredient_service.dart';
 import 'package:recipe_list/services/localauth_service.dart';
+import 'package:recipe_list/services/login_service.dart';
 import 'package:recipe_list/services/recipe_service.dart';
 import 'package:recipe_list/services/instruction_service.dart';
+import 'package:recipe_list/widgets/main_drawer.dart';
 import 'package:recipe_list/widgets/recipe_form.dart';
 
 import '../../widgets/star_rating.dart';
@@ -22,6 +24,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
   RecipeService? _recipeService;
   IngredientService? _ingredientService;
   InstructionService? _instructionService;
+  LoginService? _loginService;
 
   Future<List<CompleteRecipe>> _loadRecipes() async {
     final recipes = await _recipeService!.findAll;
@@ -54,6 +57,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    _loginService = Provider.of<LoginService>(context, listen: true);
     _recipeService = Provider.of<RecipeService>(context, listen: true);
     _ingredientService = Provider.of<IngredientService>(context, listen: true);
     _instructionService = Provider.of<InstructionService>(
@@ -70,6 +74,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Receitas")),
+      drawer: const MainDrawer(),
       body: FutureBuilder(
         future: _recipes,
         builder: (context, snapshot) {

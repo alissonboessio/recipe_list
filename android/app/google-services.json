@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "981781411796",
+    "project_id": "recipe-list-ucs",
+    "storage_bucket": "recipe-list-ucs.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981781411796:android:41b484446bb903c4444841",
+        "android_client_info": {
+          "package_name": "com.example.recipe_list"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLUFy8icBwUk6D7VTqdayJTTw2GSDcFO0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
