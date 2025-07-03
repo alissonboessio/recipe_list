@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:path/path.dart';
 import 'package:recipe_list/models/ingredient.dart';
 import 'package:recipe_list/models/instruction.dart';
@@ -111,5 +113,12 @@ class DatabaseService {
           recipeId: 1,
         ).toMap(),
       );
+  }
+
+  Future<File> getSourceDatabaseFile() async {
+    final dbPath = await getDatabasesPath();
+    final source = File('$dbPath/recipe_list.db');
+
+    return source;
   }
 }

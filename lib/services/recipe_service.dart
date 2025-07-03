@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:recipe_list/models/complete_recipe.dart';
 import 'package:recipe_list/models/ingredient.dart';
 import 'package:recipe_list/models/instruction.dart';
 import 'package:recipe_list/models/recipe.dart';
@@ -48,28 +47,45 @@ class RecipeService extends ChangeNotifier {
 
     int partI = 0;
 
-    Recipe recipe = Recipe(name: parts[partI], createdAt: DateTime.now(), preparationTime: preparationTime);
+    Recipe recipe = Recipe(
+      name: parts[partI],
+      createdAt: DateTime.now(),
+      preparationTime: preparationTime,
+    );
     partI++;
     recipe.rating = rating;
 
-    recipe.id = await create(recipe);    
+    recipe.id = await create(recipe);
 
-    final _repoIngredients = GenericRepository(
+    final repoIngredients = GenericRepository(
       tableName: Ingredient.tableName,
       fromMap: Ingredient.fromMap,
     );
 
     for (; partI < 5; partI++) {
-      await _repoIngredients.create(Ingredient(recipeId: recipe.id!, name: parts[partI], measure: parts[partI].split(" ")[0], quantity: random.nextInt(10) + 1));
+      await repoIngredients.create(
+        Ingredient(
+          recipeId: recipe.id!,
+          name: parts[partI],
+          measure: parts[partI].split(" ")[0],
+          quantity: random.nextInt(10) + 1,
+        ),
+      );
     }
 
-    final _repoIntructions = GenericRepository(
+    final repoIntructions = GenericRepository(
       tableName: Instruction.tableName,
       fromMap: Instruction.fromMap,
     );
 
     for (var i = 1; partI < 9; partI++, i++) {
-      await _repoIntructions.create(Instruction(recipeId: recipe.id!, instruction: parts[partI], instructionOrder: i));
+      await repoIntructions.create(
+        Instruction(
+          recipeId: recipe.id!,
+          instruction: parts[partI],
+          instructionOrder: i,
+        ),
+      );
     }
 
     return recipe;

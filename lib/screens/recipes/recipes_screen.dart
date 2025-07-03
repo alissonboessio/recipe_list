@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:recipe_list/models/complete_recipe.dart';
+import 'package:recipe_list/repositories/cloud_backup_repository.dart';
+import 'package:recipe_list/repositories/file_backup_repository.dart';
 import 'package:recipe_list/rotas.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe_list/services/ingredient_service.dart';
 import 'package:recipe_list/services/localauth_service.dart';
-import 'package:recipe_list/services/login_service.dart';
+import 'package:recipe_list/services/notification_service.dart';
 import 'package:recipe_list/services/recipe_service.dart';
 import 'package:recipe_list/services/instruction_service.dart';
 import 'package:recipe_list/widgets/main_drawer.dart';
 import 'package:recipe_list/widgets/recipe_form.dart';
-
-import '../../widgets/star_rating.dart';
+import 'package:recipe_list/widgets/star_rating.dart';
 
 class RecipesScreen extends StatefulWidget {
   const RecipesScreen({super.key});
@@ -24,9 +25,13 @@ class _RecipesScreenState extends State<RecipesScreen> {
   RecipeService? _recipeService;
   IngredientService? _ingredientService;
   InstructionService? _instructionService;
-  LoginService? _loginService;
+
+  final _fileBackupRepository = FileBackupRepository();
+  final _cloudBackupRepository = CloudBackupRepository();
+  final _notificationService = NotificationService();
 
   Future<List<CompleteRecipe>> _loadRecipes() async {
+    print('LOAD RECIPES ');
     final recipes = await _recipeService!.findAll;
 
     final List<CompleteRecipe> list = [];
@@ -57,7 +62,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _loginService = Provider.of<LoginService>(context, listen: true);
     _recipeService = Provider.of<RecipeService>(context, listen: true);
     _ingredientService = Provider.of<IngredientService>(context, listen: true);
     _instructionService = Provider.of<InstructionService>(
@@ -109,9 +113,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
                   if (!autenticado) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Autenticação falhou!"),
-                      ),
+                      const SnackBar(content: Text("Autenticação falhou!")),
                     );
                     return false;
                   }
@@ -190,11 +192,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
             heroTag: null,
             onPressed: () async {
               var recipe = await _recipeService!.createRandomRecipe();
-              Navigator.pushNamed(
-                context,
-                Rotas.recipe,
-                arguments: recipe.id,
-              );
+              Navigator.pushNamed(context, Rotas.recipe, arguments: recipe.id);
             },
             tooltip: "Receita Aleatória",
             child: const Icon(Icons.help_outline),
@@ -212,6 +210,91 @@ class _RecipesScreenState extends State<RecipesScreen> {
             },
             tooltip: "Adicionar Receita",
             child: const Icon(Icons.add),
+          ),
+          FloatingActionButton(
+            onPressed: () async {
+              await Navigator.pushNamed(context, Rotas.backup);
+
+              setState(() {
+                _recipes = _loadRecipes();
+              });
+            },
+            tooltip: "Restaurar Backups",
+            child: const Icon(Icons.settings_backup_restore),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                showDragHandle: true,
+                useSafeArea: true,
+                builder:
+                    (_) => Row(
+                      children: [
+                        Expanded(
+                          child: Card(
+                            child: Column(
+                              children: [
+                                TextButton.icon(
+                                  onPressed: () async {
+                                    try {
+                                      await _cloudBackupRepository.saveBackup();
+
+                                      await _notificationService.showNotification(
+                                        title: 'Backup na Cloud realizado',
+                                        body:
+                                            'As suas receitas foram salvas na cloud!',
+                                      );
+                                    } catch (err) {
+                                      await _notificationService.showNotification(
+                                        title: 'Backup na Cloud falhou',
+                                        body:
+                                            'Não foi possível salvar as suas receitas na cloud.',
+                                      );
+                                    }
+                                  },
+                                  label: Text(
+                                    'Backup Cloud',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  icon: Icon(Icons.cloud, size: 20),
+                                ),
+                                SizedBox(height: 16),
+                                TextButton.icon(
+                                  onPressed: () async {
+                                    try {
+                                      await _fileBackupRepository.saveBackup();
+
+                                      await _notificationService.showNotification(
+                                        title:
+                                            'Backup realizado no Dispositivo',
+                                        body:
+                                            'As suas receitas foram salvas no dispositivo!',
+                                      );
+                                    } catch (err) {
+                                      await _notificationService.showNotification(
+                                        title: 'Backup no Dispositivo falhou',
+                                        body:
+                                            'Não foi possível salvar as suas receitas no dispositivo.',
+                                      );
+                                    }
+                                  },
+                                  label: Text(
+                                    'Backup Local',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  icon: Icon(Icons.save, size: 20),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+              );
+            },
+            tooltip: "Criar Backups",
+            child: const Icon(Icons.backup),
           ),
         ],
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:recipe_list/firebase_options.dart';
 import 'package:recipe_list/rotas.dart';
+import 'package:recipe_list/screens/recipes/backup_screen.dart';
 import 'package:recipe_list/screens/recipes/login_screen.dart';
 import 'package:recipe_list/screens/recipes/recipe_edit_screen.dart';
 import 'package:recipe_list/screens/recipes/recipe_screen.dart';
@@ -17,11 +19,11 @@ import 'package:firebase_core/firebase_core.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await _initializeLocalNotifications();
+
   await DatabaseService().initDatabase();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const MainApp());
 }
@@ -46,8 +48,20 @@ class MainApp extends StatelessWidget {
           Rotas.recipes: (context) => RecipesScreen(),
           Rotas.recipe: (context) => RecipeScreen(),
           Rotas.recipeEdit: (context) => RecipeEditScreen(),
+          Rotas.backup: (context) => BackupScreen(),
         },
       ),
     );
   }
+}
+
+Future<void> _initializeLocalNotifications() async {
+  const AndroidInitializationSettings androidSettings =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings settings = InitializationSettings(
+    android: androidSettings,
+  );
+
+  await FlutterLocalNotificationsPlugin().initialize(settings);
 }

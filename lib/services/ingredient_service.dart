@@ -3,7 +3,6 @@ import 'package:recipe_list/models/ingredient.dart';
 import 'package:recipe_list/repositories/repository.dart';
 
 class IngredientService extends ChangeNotifier {
-  // final IngredientRepository repository = IngredientRepository();
   final _repository = GenericRepository<Ingredient>(
     tableName: Ingredient.tableName,
     fromMap: Ingredient.fromMap,

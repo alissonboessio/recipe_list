@@ -2,14 +2,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginService extends ChangeNotifier {
+  // singleton
+  factory LoginService() => _instance;
+
+  LoginService.internal();
+  static final LoginService _instance = LoginService.internal();
+
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  get user => _firebaseAuth.currentUser;
+  User? get user => _firebaseAuth.currentUser;
 
   Future<String?> login(String email, String senha) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: senha);
+        email: email,
+        password: senha,
+      );
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case "user-not-found":
@@ -23,16 +31,10 @@ class LoginService extends ChangeNotifier {
     return null;
   }
 
-  Future<String?> signIn(String email,
-    String senha,
-    String nome
-  ) async {
+  Future<String?> signIn(String email, String senha, String nome) async {
     try {
-      UserCredential userCredential =
-          await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: senha,
-      );
+      UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: senha);
 
       await userCredential.user!.updateDisplayName(nome);
     } on FirebaseAuthException catch (e) {
@@ -57,3 +59,4 @@ class LoginService extends ChangeNotifier {
     return null;
   }
 }
+
